@@ -2,19 +2,17 @@ package com.beacon.clockview;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.EmbossMaskFilter;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
-import android.graphics.RadialGradient;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -80,6 +78,7 @@ public class ClockView extends View {
     private RectF mSecondRect;
     private Paint mClockPaint;
     private int mClockSize;
+    private LinearGradient mLinearGradient;
 
     public ClockView(Context context) {
         this(context, null);
@@ -108,7 +107,7 @@ public class ClockView extends View {
         init();
     }
 
-    private Handler mHandler = new Handler() {
+    private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             second += SECOND_ANGLE;
@@ -180,13 +179,14 @@ public class ClockView extends View {
             height = DEFAULT_SIZE;
         }
         mClockSize = Math.min(width, height);
+        mLinearGradient = new LinearGradient(mClockSize / 2, 0, mClockSize / 2,
+                mClockSize, Color.GRAY, Color.BLACK, Shader.TileMode.CLAMP);
         setMeasuredDimension(mClockSize, mClockSize);
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
-
         canvas.drawCircle(mClockSize / 2, mClockSize / 2, mClockSize / 2 - clockCircleWidth, mClockPaint);
 
         mSecondRect.left = mSecondRect.top = mClockSize / 8;
@@ -204,8 +204,8 @@ public class ClockView extends View {
         canvas.drawPoint(mClockSize / 2, mClockSize / 2, mPointPaint);
 
 
-        mClockCirclePaint.setShader(new LinearGradient(mClockSize / 2, 0, mClockSize / 2,
-                mClockSize, Color.GRAY, Color.BLACK, Shader.TileMode.CLAMP));
+        mClockCirclePaint.setShader(mLinearGradient);
+
         canvas.drawCircle(mClockSize / 2, mClockSize / 2, mClockSize / 2 - clockCircleWidth, mClockCirclePaint);
 
         mHandler.sendEmptyMessageDelayed(0, 1000);
